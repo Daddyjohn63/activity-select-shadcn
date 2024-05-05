@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import ActivitiesList from './ActivitiesComponent';
 import SelectedActivitiesSidebar from './ActivitiesSidebar';
 
+// Define the Zod schema for form validation
 const FormSchema = z.object({
   activities: z
     .array(
@@ -31,33 +32,38 @@ const FormSchema = z.object({
     .nonempty({ message: 'You must select at least one activity' })
 });
 
+// Main component for the activity form
 export default function ActivityFormShadcn() {
+  // State to manage selected activities
   const [selectedActivities, setSelectedActivities] = useState([]);
-
+  // Initialize form
   const form = useForm({
-    resolver: zodResolver(FormSchema),
-    defaultValues: { activities: [] }
+    resolver: zodResolver(FormSchema), // Apply Zod schema for validation
+    defaultValues: { activities: [] } // Set default form values
   });
 
-  const { setError, clearErrors, reset } = form;
+  const { setError, clearErrors, reset } = form; // Destructure form methods from RHF
 
+  // Function to handle form submission
   const onSubmit = data => {
     console.log('FORM SUBMIT', data.activities);
-    reset();
-    setSelectedActivities([]);
+    reset(); // Reset the form after submission
+    setSelectedActivities([]); // Clear selected activities
   };
 
+  // Function to add an activity to the selected list
   const addActivity = activity => {
     setSelectedActivities(prev => {
       // Check if the activity is already added
       if (!prev.find(act => act.label === activity.label)) {
-        clearErrors('activities');
+        clearErrors('activities'); // Clear any existing validation errors
         return [...prev, activity]; // Add the new activity
       }
       return prev; // Return the current list unchanged if the activity is already there
     });
   };
 
+  // Function to remove an activity from the selected list
   const removeActivity = activityLabel => {
     setSelectedActivities(prev => {
       const newActivities = prev.filter(act => act.label !== activityLabel);
@@ -69,6 +75,7 @@ export default function ActivityFormShadcn() {
     });
   };
 
+  // Update form value when selected activities change
   useEffect(() => {
     form.setValue('activities', selectedActivities);
   }, [selectedActivities, form]);
